@@ -3,10 +3,11 @@ package com.springproject.SpringTriviaApp.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
 import com.springproject.SpringTriviaApp.entity.CategoryEntity;
 import com.springproject.SpringTriviaApp.entity.QuestionEntity;
-import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jackson.JsonObjectSerializer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -27,7 +28,7 @@ public class TriviaApiConnectionService {
     private final String GET_QUESTIONS_URI = "https://opentdb.com/api.php";
 
     public List<CategoryEntity> getAllCategories() throws JsonProcessingException {
-        JSONObject response = restTemplate.getForObject(GET_CATEGORIES_URI, JSONObject.class);
+        JSONObject response = restTemplate.getForObject(GET_CATEGORIES_URI, JsonObjectSerializer.class);
 
         ObjectMapper mapper = new ObjectMapper();
         List<CategoryEntity> category_lst = mapper.convertValue(response.get("trivia_categories"), new TypeReference<List<CategoryEntity>>(){});
@@ -59,7 +60,7 @@ public class TriviaApiConnectionService {
                 .encode()
                 .toUri();
 
-        JSONObject response = restTemplate.getForObject(targetUrl, JSONObject.class);
+        JsonObjectFormatVisitor response = (JsonObjectFormatVisitor) restTemplate.getForObject(targetUrl, JsonObjectSerializer.class);
 
         ObjectMapper mapper = new ObjectMapper();
         List<QuestionEntity> question_lst = mapper.convertValue(response.get("results"), new TypeReference<List<QuestionEntity>>(){});
